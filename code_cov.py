@@ -465,7 +465,7 @@ params.add('deltam', vary=False, value = -0.070, min=-100., max = 100.)
 minicov = Minimizer(calculResidu2,params,fcn_args=(eta_ar,tab_masse,tab_cov_m_s,tab_cov_m_c,tab_cov_s_c,zcmb_ar,bmag_ar,x0,x1_ar,c_ar,redshift_err_ar,bmag_err_ar,x0_err,x1_err_ar,c_err_ar))
 
 
-
+#Minimisation avec Minuit
 #m = Minuit(fonctionMinimizer,errordef=1,alpha=0.141,error_alpha=0.001,limit_alpha=(0,10),beta=3.101,error_beta=0.001,limit_beta=(0,10),omega_m=0.3,error_omega_m=0.1,limit_omega_m=(0,1),omega_l=0.7,error_omega_l=0.1,limit_omega_l=(0,1),M=-19.05,limit_M=(-100,100),deltam=-0.04,limit_deltam=(-10,10))
 #m.migrad(ncall=100000)
 #exit(1)
