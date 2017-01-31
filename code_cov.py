@@ -1,10 +1,3 @@
-#un fichier avec alpha, beta, x1, x0, mB...pour chaque SN
-#une def pour ouvrir le fichier
-#une def pour stocker les params
-#une def pour calculer la distance en theorie
-#une def pour calculer la distance avec obs
-#une def pour minimiser les deux
-
 
 
 import numpy as np
@@ -497,7 +490,7 @@ erreur_valeurcov =[]
 print ""	
 
 print(resultcov.message)
-print "chisqr:", (resultcov.chisqr)
+print "chisqr :", (resultcov.chisqr)
 for k,v in resultcov.params.items():
 	print k, ' === ', v.value
 	valeurcov.append(v.value)
