@@ -66,7 +66,7 @@ def integrale(zz,wm,wl):
 
 def script_lumdist(wm, wl, zed):
 
-###calcul de DL sans H0
+
 ####Modele domine par la matire et la constante cosmologique####
 	H0= 0.7
 	clum = 299792458.
@@ -200,21 +200,14 @@ def calculResidu2(params,eta,masse,tab_cov_m_s,tab_cov_m_c,tab_cov_s_c,redshift,
 	tab_res=mu-model
 
 
-	#fig=plt.figure()
-	#plt.scatter(redshift,script_lumdist(omega_m, omega_l, redshift))
-	#nom='dll'+'.pdf'
-	#plt.savefig(nom)
-	#plt.close(fig)
-	#exit(1)
-
 
 	#**********************************
 	#Mise a jour matrice covariance
 	
 	for i in range(0,740):
-		cov_m_s=tab_cov_m_s[i] #================?
-		cov_m_c=tab_cov_m_c[i]  #================?
-		cov_s_c=tab_cov_s_c[i]  #================?
+		cov_m_s=tab_cov_m_s[i] 
+		cov_m_c=tab_cov_m_c[i]  
+		cov_s_c=tab_cov_s_c[i] 
 		Cmu[i,i]=Cmu[i, i] + bmag_err[i]**2 + (alpha*x1_err[i])**2 + (beta * c_err[i])**2 + 2.0* (alpha*cov_m_s - beta *cov_m_c -alpha*beta*cov_s_c)
 	
 	#********************************
@@ -240,15 +233,10 @@ def calculResidu2(params,eta,masse,tab_cov_m_s,tab_cov_m_c,tab_cov_s_c,redshift,
 	#**********************************
 
 
-	#print tab_res.T.shape
-	#print Cinverse.shape
-	#print tab_res.shape
-	#print residu.shape
-	#exit(1)
-
 	return residu
 
 
+###fonction pour utiliser Minuit
 def fonctionMinimizer(alpha,beta,omega_m,omega_l,M,deltam):
 	global nbAppel
 	nbAppel=nbAppel+1
@@ -283,9 +271,9 @@ def fonctionMinimizer(alpha,beta,omega_m,omega_l,M,deltam):
 	#Mise a jour matrice covariance
 	
 	for i in range(0,740):
-		cov_m_s=tab_cov_m_s[i] #================?
-		cov_m_c=tab_cov_m_c[i]  #================?
-		cov_s_c=tab_cov_s_c[i]  #================?
+		cov_m_s=tab_cov_m_s[i] 
+		cov_m_c=tab_cov_m_c[i] 
+		cov_s_c=tab_cov_s_c[i] 
 		Cmu[i,i]=Cmu[i, i] + bmag_err_ar[i]**2 + (alpha*x1_err_ar[i])**2 + (beta * c_err_ar[i])**2 + 2.0* (alpha*cov_m_s - beta *cov_m_c -alpha*beta*cov_s_c)
 	
 
@@ -416,7 +404,9 @@ for i in range(0,len(bmag)):
 	n=n+1
 print n
 
-'''
+
+#Plot des differences entre les valeurs de fits de SALT donnees par Betoule et obtenues avec ma version
+
 plt.subplot(2,2,1)
 plt.hist(diff1,bins=200,log=True)
 
@@ -433,8 +423,7 @@ plt.subplot(2,2,4)
 plt.hist(diff4,bins=200,log=True)
 
 plt.show()
-exit(1)
-'''
+
 
 eta=np.zeros(3*740)
 eta_ar=np.zeros(3*740)
@@ -461,24 +450,21 @@ params.add('M', vary=True, value = -19.05, min=-100., max = 100.)
 params.add('deltam', vary=False, value = -0.070, min=-100., max = 100.)
 
 
+#Minimisation avec Minuit
+m = Minuit(fonctionMinimizer,errordef=1,alpha=0.141,error_alpha=0.001,limit_alpha=(0,10),beta=3.101,error_beta=0.001,limit_beta=(0,10),omega_m=0.3,error_omega_m=0.1,limit_omega_m=(0,1),omega_l=0.7,error_omega_l=0.1,limit_omega_l=(0,1),M=-19.05,limit_M=(-100,100),deltam=-0.04,limit_deltam=(-10,10))
+m.migrad(ncall=100000)
+exit(1)
+
+
+#Minimisation avec la fonctin minimizer de python
+
 #minicov = Minimizer(calculResidu2,params,fcn_args=(eta,tab_masse,tab_cov_m_s,tab_cov_m_c,tab_cov_s_c,redshift,bmag,x0,x1,c,redshift_err,bmag_err,x0_err,x1_err,c_err))
 minicov = Minimizer(calculResidu2,params,fcn_args=(eta_ar,tab_masse,tab_cov_m_s,tab_cov_m_c,tab_cov_s_c,zcmb_ar,bmag_ar,x0,x1_ar,c_ar,redshift_err_ar,bmag_err_ar,x0_err,x1_err_ar,c_err_ar))
 
 
-#Minimisation avec Minuit
-#m = Minuit(fonctionMinimizer,errordef=1,alpha=0.141,error_alpha=0.001,limit_alpha=(0,10),beta=3.101,error_beta=0.001,limit_beta=(0,10),omega_m=0.3,error_omega_m=0.1,limit_omega_m=(0,1),omega_l=0.7,error_omega_l=0.1,limit_omega_l=(0,1),M=-19.05,limit_M=(-100,100),deltam=-0.04,limit_deltam=(-10,10))
-#m.migrad(ncall=100000)
-#exit(1)
 
-#resultcov = minicov.minimize(method='nelder')
-#resultcov = minicov.minimize(method='slsqp')
-#resultcov = minicov.minimize(method='least_squares')
-resultcov = minicov.minimize(method=' SLSQP')
+resultcov = minicov.minimize(method=' chisqr')
 
-
-#ci = conf_interval(minicov, resultcov)
-#lmfit.printfuncs.report_ci(ci)
-#resultcov = minicov.nelder(maxfev=10000000)
 
 
 
@@ -520,13 +506,4 @@ print "M=",M_cov,"+/-",M_cov_err
 print "deltaM=",deltam_cov,"+/-",deltam_cov_err
 
 
-"""
-print nbAppel, ")", alpha,beta,omega_m,omega_l,M,deltam
-#En gros il faut : 
-omega_m = 0.295
-omega_l = 1-omega_m
-alpha= 0.141
-beta = 3.101
-M = -19.05
-"""
 
